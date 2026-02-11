@@ -1,0 +1,7 @@
+{
+  "name": "vassist",
+  "version": "3.0.0",
+  "description": "VAssist — Campus Delivery Platform with Firebase real-time backend",
+  "author": "Yuvraj Chopra",
+  "license": "MIT"
+}

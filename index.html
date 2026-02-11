@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>VAssist | Campus Delivery — Fast, Smart, Student-Powered</title>
+    <meta name="description"
+        content="VAssist is the ultimate campus delivery platform for VIT. Get food, stationery, and more delivered by fellow students. Fast, affordable, reliable.">
+    <meta name="theme-color" content="#6C63FF">
+    <meta property="og:title" content="VAssist — Campus Delivery Network">
+    <meta property="og:description" content="Fast campus deliveries powered by students at VIT Vellore.">
+    <meta property="og:type" content="website">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Preconnect for Speed -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+
+    <!-- Fonts & Leaflet -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- ═══════════════════════════════════════════
+         🚀 SPLASH SCREEN — Cinematic Entry with Logo & Cursor
+         ═══════════════════════════════════════════ -->
+    <div id="splash-screen">
+        <div class="splash-particles"></div>
+        <div class="logo-container">
+            <!-- Logo Image Placeholder -->
+            <div class="logo-image-frame">
+                <div class="logo-image-placeholder">
+                    <span>⚡</span>
+                </div>
+                <div class="logo-ring-spin"></div>
+            </div>
+
+            <h1>VAssist</h1>
+            <p>From Store To Door!!!</p>
+
+            <!-- Centered Loading Cursor -->
+            <div class="splash-cursor-loader">
+                <div class="cursor-dot"></div>
+                <div class="cursor-ring"></div>
+                <div class="cursor-ring ring-2"></div>
+            </div>
+
+            <div class="splash-status">Connecting to campus network...</div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         📱 MAIN APP
+         ═══════════════════════════════════════════ -->
+    <div class="app-container">
+
+        <!-- Glass Header -->
+        <header class="glass-header" id="app-header">
+            <div class="brand">⚡ VAssist</div>
+
+            <div class="mode-switch-container">
+                <span class="mode-label" id="label-user">User</span>
+                <label class="switch no-select">
+                    <input type="checkbox" id="mode-toggle">
+                    <span class="slider round"></span>
+                </label>
+                <span class="mode-label" id="label-partner">Partner</span>
+            </div>
+        </header>
+
+        <!-- Map -->
+        <div id="map"></div>
+
+        <!-- Locate Button (FAB) -->
+        <button id="locate-btn" class="fab-btn" aria-label="Locate me on map">📍</button>
+
+        <!-- ═══════════════════════════════════════
+             👤 USER UI
+             ═══════════════════════════════════════ -->
+        <main id="user-ui" class="ui-layer">
+
+            <!-- Panel 1: Request -->
+            <section id="request-panel" class="panel active">
+                <div class="panel-handle"></div>
+                <h2>Need something?</h2>
+
+                <div class="input-wrapper">
+                    <span class="icon">📦</span>
+                    <input type="text" id="item-input" placeholder="E.g., Bluebook, Coffee, Charger..."
+                        autocomplete="off">
+                </div>
+
+                <div class="location-box">
+                    <div class="loc-row" id="pickup-row">
+                        <span class="dot green"></span>
+                        <input type="text" id="pickup-input" placeholder="Tap map for Pickup Store" readonly>
+                    </div>
+                    <div class="line"></div>
+                    <div class="loc-row">
+                        <span class="dot red"></span>
+                        <input type="text" id="drop-input" value="Detecting location..." readonly>
+                    </div>
+                </div>
+
+                <button id="find-assist-btn" class="primary-btn" disabled>
+                    Find Assistant <span class="arrow">→</span>
+                </button>
+            </section>
+
+            <!-- Panel 2: Choose Delivery Mode -->
+            <section id="mode-panel" class="panel">
+                <div class="panel-header">
+                    <button class="back-btn" id="back-to-request">← Back</button>
+                    <h3>Choose Delivery</h3>
+                </div>
+                <div class="options-grid">
+                    <div class="option-card selected" data-type="walker" id="card-walker">
+                        <div class="opt-icon">🚶</div>
+                        <h4>Walker</h4>
+                        <div class="opt-price">₹<span id="price-walker">--</span></div>
+                    </div>
+                    <div class="option-card" data-type="cyclist" id="card-cyclist">
+                        <div class="opt-icon">🚲</div>
+                        <h4>Cyclist</h4>
+                        <div class="opt-price">₹<span id="price-cyclist">--</span></div>
+                    </div>
+                </div>
+                <button id="confirm-btn" class="primary-btn">
+                    Request Now <span class="arrow">→</span>
+                </button>
+            </section>
+
+            <!-- Panel 3: Tracking -->
+            <section id="track-panel" class="panel">
+                <div class="radar-container" id="radar-section">
+                    <div class="radar-circle">
+                        <div class="radar-scanner"></div>
+                    </div>
+                    <div class="radar-text" id="track-status">Looking for nearby students...</div>
+                </div>
+
+                <div id="assigned-info" class="assistant-card hidden">
+                    <div class="profile-pic">🎓</div>
+                    <div class="profile-info">
+                        <h3 id="ast-name">Name</h3>
+                        <p id="ast-status">On the way to store</p>
+                    </div>
+                    <div class="otp-badge">OTP: <span id="otp-display">0000</span></div>
+                </div>
+
+                <div class="delivery-timeline hidden" id="delivery-timeline">
+                    <div class="timeline-step completed" id="step-1">
+                        <div class="step-indicator">✓</div>
+                        <div class="step-content">
+                            <h4>Request Accepted</h4>
+                            <p>Partner confirmed your order</p>
+                        </div>
+                    </div>
+                    <div class="timeline-step active" id="step-2">
+                        <div class="step-indicator">🏃</div>
+                        <div class="step-content">
+                            <h4>Heading to Store</h4>
+                            <p>Partner is on the way to pickup</p>
+                        </div>
+                    </div>
+                    <div class="timeline-step" id="step-3">
+                        <div class="step-indicator">📦</div>
+                        <div class="step-content">
+                            <h4>Item Picked Up</h4>
+                            <p>Heading to your location</p>
+                        </div>
+                    </div>
+                    <div class="timeline-step" id="step-4">
+                        <div class="step-indicator">✅</div>
+                        <div class="step-content">
+                            <h4>Delivered!</h4>
+                            <p>Share OTP to receive</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- ═══════════════════════════════════════
+             🎒 PARTNER UI
+             ═══════════════════════════════════════ -->
+        <main id="partner-ui" class="ui-layer hidden-mode">
+
+            <div class="partner-dashboard">
+                <div class="dash-header">
+                    <h3>🔴 Live Requests</h3>
+                    <span class="online-badge">Online</span>
+                </div>
+
+                <div id="requests-list" class="requests-container">
+                    <div class="empty-state">
+                        <p>No active requests nearby.</p>
+                        <small>Wait for a notification...</small>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- ═══════════════════════════════════════
+             🔐 OTP VERIFICATION MODAL
+             ═══════════════════════════════════════ -->
+        <div id="otp-modal" class="otp-modal-overlay">
+            <div class="otp-modal">
+                <button class="otp-modal-close" id="otp-close-btn">✕</button>
+                <div class="otp-modal-icon">🔐</div>
+                <h3>Enter Delivery OTP</h3>
+                <p>Ask the customer for their 4-digit OTP to confirm delivery</p>
+
+                <div class="otp-input-row">
+                    <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric"
+                        autocomplete="off">
+                    <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric"
+                        autocomplete="off">
+                    <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric"
+                        autocomplete="off">
+                    <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric"
+                        autocomplete="off">
+                </div>
+
+                <div id="otp-error" class="otp-error"></div>
+
+                <button class="primary-btn otp-submit-btn" id="otp-verify-btn">
+                    Verify OTP <span class="arrow">→</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="toast">Message Here</div>
+
+        <!-- Watermark -->
+        <div class="watermark">Built by Yuvraj Chopra</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         📜 SCRIPTS
+         ═══════════════════════════════════════════ -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Firebase SDK (Firestore) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/location.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
